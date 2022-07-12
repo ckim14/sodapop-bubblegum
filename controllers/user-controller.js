@@ -4,11 +4,6 @@ const userController = {
   // get all user
   getAllUser(req, res) {
     User.find({})
-      .populate({
-        path: "user",
-        select: "-__v",
-      })
-      .select("-__v")
       .sort({ _id: -1 })
       .then((dbUserData) => res.json(dbUserData))
       .catch((err) => {
@@ -20,14 +15,6 @@ const userController = {
   // get one user by id
   getUserById({ params }, res) {
     User.findOne({ _id: params.userId })
-      .populate({
-        path: "thoughts",
-        select: "-__v",
-      })
-      .populate({
-        path: "friends",
-        select: "-__v",
-      })
       .select("-__v")
       .then((dbUserData) => res.json(dbUserData))
       .catch((err) => {
@@ -47,8 +34,8 @@ const userController = {
   // update user
   updateUser({ params, body }, res) {
     User.findOneAndUpdate({ _id: params.userId }, body, {
-      new: true,
       runValidators: true,
+      new: true,
     })
       .then((dbUserData) => {
         if (!dbUserData) {
@@ -95,16 +82,17 @@ const userController = {
 
   // delete friend
   deleteFriend({ params }, res) {
-    User.findOneAndUpdate(
+    User.findByIdAndUpdate(
       { _id: params.userId },
       { $pull: { friends: { friendId: params.friendId } } },
       { new: true }
     )
-      .then((dbUserData) => {
-        if (!dbUserData) {
-          return res.status(404).json({ message: "No user with this id!" });
+      .then((deletedFriend) => {
+        if (!deletedFriend) {
+          res.status(404).json({ message: "No friend with this id!" });
+          return;
         }
-        res.json(dbUserData);
+        res.json({ message: "Friend has been deleted!" });
       })
       .catch((err) => res.json(err));
   },

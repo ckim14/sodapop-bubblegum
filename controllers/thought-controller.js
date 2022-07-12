@@ -26,25 +26,21 @@ const thoughtController = {
   // create thought to user
   createThought({ params, body }, res) {
     console.log(params);
-    Thought.create(body)
-      .then((dbThoughtData) => {
-        User.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { thoughts: dbThoughtData._id } },
-          { new: true, runValidators: true }
-        );
-        console.log(dbThoughtData);
-        res.json(dbThoughtData);
-      })
-      .then((dbUserData) => {
+    Thought.create(body).then((dbThoughtData) => {
+      User.findOneAndUpdate(
+        { _id: body.userId },
+        { $push: { thoughts: dbThoughtData._id } },
+        { new: true, runValidators: true }
+      ).then((dbUserData) => {
         console.log(dbUserData);
         if (!dbUserData) {
           res.status(404).json({ message: "No User found with this id!" });
           return;
         }
-        res.json(dbUserData);
-      })
-      .catch((err) => res.json(err));
+        console.log(dbThoughtData);
+        res.json(dbThoughtData);
+      });
+    });
   },
 
   // create a reaction to thought
@@ -82,7 +78,7 @@ const thoughtController = {
 
   // delete thought
   deleteThought({ params }, res) {
-    Thought.findOneAnddelete({ _id: params.thoughtId })
+    Thought.findOneAndRemove({ _id: params.thoughtId })
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => res.json(err));
   },
