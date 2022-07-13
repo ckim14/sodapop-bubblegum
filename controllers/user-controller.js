@@ -82,9 +82,9 @@ const userController = {
 
   // delete friend
   deleteFriend({ params }, res) {
-    User.findByIdAndUpdate(
+    User.findOneAndUpdate(
       { _id: params.userId },
-      { $pull: { friends: { friendId: params.friendId } } },
+      { $pull: { friends: { $eq: params.friendId } } },
       { new: true }
     )
       .then((deletedFriend) => {
@@ -92,7 +92,7 @@ const userController = {
           res.status(404).json({ message: "No friend with this id!" });
           return;
         }
-        res.json({ message: "Friend has been deleted!" });
+        res.json(deletedFriend);
       })
       .catch((err) => res.json(err));
   },

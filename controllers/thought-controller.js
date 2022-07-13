@@ -57,6 +57,7 @@ const thoughtController = {
         }
         res.json(dbThoughtData);
       })
+
       .catch((err) => res.json(err));
   },
 
@@ -79,7 +80,10 @@ const thoughtController = {
   // delete thought
   deleteThought({ params }, res) {
     Thought.findOneAndRemove({ _id: params.thoughtId })
-      .then((dbThoughtData) => res.json(dbThoughtData))
+      .then((dbThoughtData) =>
+        res.json({ message: "Thought has been deleted" })
+      )
+
       .catch((err) => res.json(err));
   },
 
